@@ -1,0 +1,6 @@
+{
+  "appId": "com.lab.atterberg",
+  "appName": "حدود اتربرگ",
+  "webDir": "www",
+  "server": { "androidScheme": "https" }
+}
