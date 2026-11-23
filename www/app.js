@@ -143,18 +143,19 @@
   /* ---------- recalculation ---------- */
   function recalc() {
     // LL
-    const pts = []; let bad = 0;
+    const pts = []; let bad = 0, outRange = 0;
     ll.forEach((r, i) => {
       const w = moisture(toNum(r.can), toNum(r.wet), toNum(r.dry));
       $('llw' + i).textContent = f2(w);
       const n = toNum(r.n);
       const any = [r.n, r.can, r.wet, r.dry].some(v => v && String(v).trim() !== '');
-      if (isFinite(w) && n > 0) pts.push({ n, w }); else if (any) bad++;
+      if (isFinite(w) && n > 0) { if (n >= XMIN && n <= XMAX) pts.push({ n, w }); else outRange++; } else if (any) bad++;
     });
     const fit = pts.length >= LL_MIN ? fitFlow(pts) : null;
     LL = fit ? wAt(fit, 25) : NaN;
     let msg = [];
     if (bad) msg.push('ردیف ناقص یا نامعتبر (باید: قوطی < خشک ≤ تر).');
+    if (outRange) msg.push('تعداد ضربه بعضی نمونه‌ها خارج از محدوده نمودار ۹ تا ۶۰ است.');
     if (pts.length > 0 && pts.length < LL_MIN) msg.push(`حداقل ${LL_MIN} نقطه لازم است (${pts.length} نقطه معتبر).`);
     if (fit) {
       const ns = pts.map(p => p.n);
