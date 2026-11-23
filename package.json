@@ -4,7 +4,7 @@
   "private": true,
   "description": "Atterberg limits (LL / PL / PI) - Casagrande method",
   "scripts": {
-    "scripts_prep": "node scripts/prep.js",
+    "prep": "node scripts/prep.js",
     "sync": "npm run prep && npx cap sync android"
   },
   "dependencies": {
