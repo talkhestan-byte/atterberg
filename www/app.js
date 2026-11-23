@@ -98,20 +98,7 @@
       const sortedPts = [...pts].sort((a,b) => a.n-b.n);
       const xStart = sortedPts[0].n, xEnd = sortedPts[sortedPts.length - 1].n;
       const yStart = wAt(fit, xStart), yEnd = wAt(fit, xEnd);
-      const innerLo = lo + 0.7, innerHi = hi - 0.7;
-      let t0 = 0, t1 = 1;
-      const dy = yEnd - yStart;
-      if (Math.abs(dy) > 1e-9) {
-        const ta = (innerLo - yStart) / dy, tb = (innerHi - yStart) / dy;
-        const enter = Math.min(ta, tb), leave = Math.max(ta, tb);
-        t0 = Math.max(0, enter); t1 = Math.min(1, leave);
-      } else if (yStart < innerLo || yStart > innerHi) { t0 = 1; t1 = 0; }
-      if (t1 > t0) {
-        const a = Math.log10(xStart), b = Math.log10(xEnd);
-        const x1 = Math.pow(10, a + (b - a) * t0), x2 = Math.pow(10, a + (b - a) * t1);
-        const y1 = yStart + dy * t0, y2 = yStart + dy * t1;
-        s += `<line x1="${px(x1)}" y1="${py(y1)}" x2="${px(x2)}" y2="${py(y2)}" stroke="#1b4f9c" stroke-width="2.2" stroke-linecap="round"/>`;
-      }
+      s += `<line x1="${px(xStart)}" y1="${py(yStart)}" x2="${px(xEnd)}" y2="${py(yEnd)}" stroke="#1b4f9c" stroke-width="2.2" stroke-linecap="round"/>`;
     }
     // points
     pts.forEach(p => { s += `<circle cx="${px(p.n)}" cy="${py(p.w)}" r="4.5" fill="#fff" stroke="#1b4f9c" stroke-width="2"/><circle cx="${px(p.n)}" cy="${py(p.w)}" r="1.6" fill="#1b4f9c"/>`; });
@@ -297,9 +284,9 @@
     makePrintReport();
     try {
       const cap = window.Capacitor;
-      const printer = cap && cap.Plugins && cap.Plugins.WebviewPrint;
+      const printer = window.capacitorWebviewPrint && window.capacitorWebviewPrint.WebviewPrint;
       if (cap && cap.isNativePlatform && cap.isNativePlatform()) {
-        if (!printer || typeof printer.print !== 'function') throw new Error('افزونه چاپ نصب نشده است؛ نسخه جدید برنامه را بسازید.');
+        if (!printer || typeof printer.print !== 'function') throw new Error('افزونه چاپ بارگذاری نشده است؛ نسخه جدید برنامه را بسازید.');
         await printer.print({ name: 'گزارش آزمایش حدود اتربرگ' });
       } else { window.print(); }
     } catch (e) { toast('خطا در چاپ: ' + (e.message || e)); }
