@@ -29,16 +29,11 @@
       <div><label>نوع استفاده</label><select id="use"></select></div>
       <div><label>محل مصرف</label><select id="sub"></select></div>
       <div id="typeBox" class="full" style="display:none"><label>نوع مصالح (طبق جدول ضابطه)</label><select id="mtype"><option value="1">نوع ۱</option><option value="2">نوع ۲</option><option value="3">نوع ۳</option></select></div>
-      <div class="full"><label>ارزش ماسه‌ای SE (٪) — اگر ضابطه نیاز دارد</label><input id="se" type="text" inputmode="decimal"></div>
       <div id="concExtra" class="full grid" style="display:none">
         <div><label>عبوری از الک ۷۵ میکرون (٪)</label><input id="p75" type="text" inputmode="decimal"></div>
         <div><label>نوع ماسه</label><select id="aggType"><option value="natural">طبیعی</option><option value="crushed">شکسته</option></select></div>
         <div><label>نوع بتن</label><select id="conType"><option value="normal">معمولی</option><option value="scc">خودتراکم</option></select></div>
         <div><label>بتن تحت سایش</label><select id="abrasion"><option value="no">خیر</option><option value="yes">بله</option></select></div>
-      </div>
-      <div id="extraEarth" class="full grid">
-        <div><label>حد مجاز پروژه: LL (اختیاری)</label><input id="projLL" type="text" inputmode="decimal"></div>
-        <div><label>حد مجاز پروژه: PI (اختیاری)</label><input id="projPI" type="text" inputmode="decimal"></div>
       </div>
     </div>
   </section>
@@ -50,7 +45,7 @@
       <div style="flex:1;font-size:12px;color:var(--mut);line-height:1.9">۳ تا ۵ نمونه با تعداد ضربه‌های متفاوت (ترجیحاً بین ۱۵ تا ۳۵ ضربه). قوطی + نمونه تر و قوطی + نمونه خشک را بر حسب گرم وارد کنید.</div>
     </div>
     <div class="tbl-wrap" style="margin-top:10px"><table>
-      <thead><tr><th>#</th><th>تعداد ضربه N</th><th>وزن قوطی (g)</th><th>قوطی+نمونه تر (g)</th><th>قوطی+نمونه خشک (g)</th><th>رطوبت ٪</th></tr></thead>
+      <thead><tr><th>#</th><th>تعداد<br>ضربه N</th><th>وزن<br>قوطی (g)</th><th>قوطی + نمونه<br>تر (g)</th><th>قوطی + نمونه<br>خشک (g)</th><th>رطوبت<br>(٪)</th></tr></thead>
       <tbody id="llBody"></tbody>
     </table></div>
     <div class="rowbtns"><button id="llDel">− حذف ردیف</button><button id="llAdd" class="add">+ افزودن ردیف</button></div>
@@ -66,10 +61,9 @@
       <div style="flex:1;font-size:12px;color:var(--mut);line-height:1.9">حداقل ۲ نمونه؛ میانگین رطوبت‌ها به‌عنوان PL گزارش می‌شود.</div>
     </div>
     <div class="tbl-wrap" style="margin-top:10px"><table>
-      <thead><tr><th>#</th><th>وزن قوطی (g)</th><th>قوطی+نمونه تر (g)</th><th>قوطی+نمونه خشک (g)</th><th>رطوبت ٪</th></tr></thead>
+      <thead><tr><th>ردیف</th><th>وزن<br>قوطی (g)</th><th>قوطی + نمونه<br>تر (g)</th><th>قوطی + نمونه<br>خشک (g)</th><th>رطوبت<br>(٪)</th></tr></thead>
       <tbody id="plBody"></tbody>
     </table></div>
-    <div class="rowbtns"><button id="plDel">− حذف ردیف</button><button id="plAdd" class="add">+ افزودن ردیف</button></div>
     <div class="msg" id="plMsg"></div>
     <div class="out"><div><label>PL</label><input id="plOut" readonly placeholder="?= PL"></div></div>
   </section>
@@ -89,6 +83,7 @@
   </section>
 </main>
 
+<section id="printReport" aria-hidden="true"></section>
 <div id="modal"><div class="box"><h3>نام فایل PDF</h3><input id="fname" type="text"><div class="btns"><button class="cancel" id="mCancel">انصراف</button><button class="ok" id="mOk">تأیید</button></div></div></div>
 <div id="toast"></div>
 
