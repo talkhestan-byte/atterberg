@@ -21,14 +21,11 @@
     <h2>مشخصات عمومی</h2>
     <div class="grid">
       <div class="full"><label>نام پروژه</label><input id="project" type="text"></div>
-      <div><label>تاریخ نمونه‌برداری</label><input id="sdate" type="date"></div>
+      <div><label>تاریخ نمونه‌برداری</label><input id="sdate" type="text" inputmode="numeric" placeholder="مثلاً ۱۴۰۵/۰۸/۲۳"></div>
       <div><label>محل نمونه‌برداری</label><input id="splace" type="text"></div>
       <div class="full"><label>نوع نمونه</label><input id="stype" type="text" list="stypes"></div>
       <datalist id="stypes"><option value="خاک رس"><option value="خاک لای"><option value="ماسه"><option value="مصالح اساس"><option value="مصالح زیراساس"></datalist>
-      <div class="full"><label>نسخه / مرجع ضوابط</label><select id="version"></select></div>
       <div><label>نوع استفاده</label><select id="use"></select></div>
-      <div><label>محل مصرف</label><select id="sub"></select></div>
-      <div id="typeBox" class="full" style="display:none"><label>نوع مصالح (طبق جدول ضابطه)</label><select id="mtype"><option value="1">نوع ۱</option><option value="2">نوع ۲</option><option value="3">نوع ۳</option></select></div>
       <div id="concExtra" class="full grid" style="display:none">
         <div><label>عبوری از الک ۷۵ میکرون (٪)</label><input id="p75" type="text" inputmode="decimal"></div>
         <div><label>نوع ماسه</label><select id="aggType"><option value="natural">طبیعی</option><option value="crushed">شکسته</option></select></div>
@@ -41,8 +38,7 @@
   <section class="card">
     <h2>حد روانی (LL)</h2>
     <div class="split">
-      <div class="gif-slot"><img src="assets/ll.gif" alt="" onerror="this.parentNode.classList.add('empty')"><span>محل گیف حد روانی</span></div>
-      <div style="flex:1;font-size:12px;color:var(--mut);line-height:1.9">۳ تا ۵ نمونه با تعداد ضربه‌های متفاوت (ترجیحاً بین ۱۵ تا ۳۵ ضربه). قوطی + نمونه تر و قوطی + نمونه خشک را بر حسب گرم وارد کنید.</div>
+      <div class="gif-slot"><img src="assets/ll.gif" alt="" onerror="this.parentNode.classList.add('empty')"></div>
     </div>
     <div class="tbl-wrap" style="margin-top:10px"><table>
       <thead><tr><th>#</th><th>تعداد<br>ضربه N</th><th>وزن<br>قوطی (g)</th><th>قوطی + نمونه<br>تر (g)</th><th>قوطی + نمونه<br>خشک (g)</th><th>رطوبت<br>(٪)</th></tr></thead>
@@ -57,8 +53,7 @@
   <section class="card">
     <h2>حد خمیری (PL)</h2>
     <div class="split">
-      <div class="gif-slot"><img src="assets/pl.gif" alt="" onerror="this.parentNode.classList.add('empty')"><span>محل گیف حد خمیری</span></div>
-      <div style="flex:1;font-size:12px;color:var(--mut);line-height:1.9">حداقل ۲ نمونه؛ میانگین رطوبت‌ها به‌عنوان PL گزارش می‌شود.</div>
+      <div class="gif-slot"><img src="assets/pl.gif" alt="" onerror="this.parentNode.classList.add('empty')"></div>
     </div>
     <div class="tbl-wrap" style="margin-top:10px"><table>
       <thead><tr><th>ردیف</th><th>وزن<br>قوطی (g)</th><th>قوطی + نمونه<br>تر (g)</th><th>قوطی + نمونه<br>خشک (g)</th><th>رطوبت<br>(٪)</th></tr></thead>
