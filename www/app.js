@@ -13,24 +13,12 @@
 
   /* ---------- selects ---------- */
   function fillSel(el, obj, keep) { el.innerHTML = Object.keys(obj).map(k => `<option value="${k}">${obj[k]}</option>`).join(''); if (keep && obj[keep]) el.value = keep; }
-  fillSel($('use'), R.USES); fillSel($('version'), R.VERSIONS);
-  function refreshSub() {
-    const use = $('use').value, ver = $('version').value;
-    if (use === 'concrete' && ver === 'n55') { /* concrete rules come from INSO 302 (+ Pub 101 old) */ }
-    fillSel($('sub'), R.subsFor(use, ver), $('sub').value);
-    updateExtras();
-  }
-  function updateExtras() {
-    const use = $('use').value, ver = $('version').value, sub = $('sub').value;
-    $('typeBox').style.display = R.hasTypes(use, ver, sub) ? '' : 'none';
-    $('concExtra').style.display = use === 'concrete' ? 'grid' : 'none';
-  }
-  $('use').onchange = () => { refreshSub(); recalc(); };
-  $('version').onchange = () => { refreshSub(); recalc(); };
-  $('sub').onchange = () => { updateExtras(); recalc(); };
+  fillSel($('use'), R.USES);
+  function updateExtras() { $('concExtra').style.display = $('use').value === 'concrete' ? 'grid' : 'none'; }
+  $('use').onchange = () => { updateExtras(); recalc(); };
   ['p75'].forEach(i => $(i).addEventListener('input', recalc));
-  ['mtype', 'aggType', 'conType', 'abrasion'].forEach(i => $(i).addEventListener('change', recalc));
-  refreshSub();
+  ['aggType', 'conType', 'abrasion'].forEach(i => $(i).addEventListener('change', recalc));
+  updateExtras();
 
   /* ---------- tables ---------- */
   function cell(arr, i, key, ph) {
@@ -69,10 +57,11 @@
   renderLL(); renderPL();
 
   /* ---------- chart ---------- */
-  const W = 700, H = 470, ML = 58, MR = 18, MT = 18, MB = 50;
+  const W = 700, H = 490, ML = 82, MR = 28, MT = 18, MB = 78;
   const XMIN = 9, XMAX = 60;
   const LOG_RANGE = Math.log10(XMAX / XMIN);
-  const px = N => ML + (Math.log10(N / XMIN) / LOG_RANGE) * (W - ML - MR);
+  const X_PAD = 15;
+  const px = N => ML + X_PAD + (Math.log10(N / XMIN) / LOG_RANGE) * (W - ML - MR - 2 * X_PAD);
   function drawChart(pts, fit, llVal) {
     // y range
     let ys = pts.map(p => p.w);
@@ -101,14 +90,15 @@
     [9, 10, 15, 20, 25, 30, 40, 50, 60].forEach(n => {
       s += `<text x="${px(n)}" y="${H - MB + 16}" font-size="11" text-anchor="middle" fill="#333">${n}</text>`;
     });
-    for (let w = lo; w <= hi; w += 5) s += `<text x="${ML - 12}" y="${py(w) + 4}" font-size="11" text-anchor="end" fill="#333">${w}</text>`;
+    for (let w = lo; w <= hi; w += 5) s += `<text x="${ML - 18}" y="${py(w) + 4}" font-size="11" text-anchor="end" fill="#333">${w}</text>`;
     s += `<text x="${(ML + W - MR) / 2}" y="${H - 8}" font-size="12" text-anchor="middle" fill="#333">تعداد ضربه (N) — مقیاس لگاریتمی</text>`;
     s += `<text transform="translate(14 ${(MT + H - MB) / 2}) rotate(-90)" font-size="12" text-anchor="middle" fill="#333">درصد رطوبت (٪)</text>`;
     // flow line (clipped to plot area)
     if (fit) {
-      const xStart = XMIN + 0.18, xEnd = XMAX - 0.35;
+      const sortedPts = [...pts].sort((a,b) => a.n-b.n);
+      const xStart = sortedPts[0].n, xEnd = sortedPts[sortedPts.length - 1].n;
       const yStart = wAt(fit, xStart), yEnd = wAt(fit, xEnd);
-      const innerLo = lo + 0.35, innerHi = hi - 0.35;
+      const innerLo = lo + 0.7, innerHi = hi - 0.7;
       let t0 = 0, t1 = 1;
       const dy = yEnd - yStart;
       if (Math.abs(dy) > 1e-9) {
@@ -131,10 +121,10 @@
       s += `<line x1="${X}" y1="${Y}" x2="${X}" y2="${H - MB}" stroke="#e00000" stroke-width="0.9" stroke-dasharray="5 4"/>`;
       s += `<line x1="${X}" y1="${Y}" x2="${ML}" y2="${Y}" stroke="#e00000" stroke-width="0.9" stroke-dasharray="5 4"/>`;
       s += `<circle cx="${X}" cy="${Y}" r="3" fill="#e00000"/>`;
-      s += `<rect x="${ML - 53}" y="${Y - 18}" width="38" height="15" rx="3" fill="#fff"/>`;
-      s += `<text x="${ML - 17}" y="${Y - 7}" font-size="11" text-anchor="end" fill="#e00000" font-weight="bold">${f1(llVal)}</text>`;
-      s += `<rect x="${X + 5}" y="${H - MB + 19}" width="22" height="14" rx="3" fill="#fff"/>`;
-      s += `<text x="${X + 16}" y="${H - MB + 30}" font-size="11" text-anchor="middle" fill="#e00000" font-weight="bold">25</text>`;
+      s += `<rect x="${ML - 76}" y="${Y - 19}" width="48" height="16" rx="3" fill="#fff"/>`;
+      s += `<text x="${ML - 31}" y="${Y - 7}" font-size="11" text-anchor="end" fill="#e00000" font-weight="bold">${f1(llVal)}</text>`;
+      s += `<rect x="${X - 11}" y="${H - MB + 37}" width="22" height="15" rx="3" fill="#fff"/>`;
+      s += `<text x="${X}" y="${H - MB + 49}" font-size="11" text-anchor="middle" fill="#e00000" font-weight="bold">25</text>`;
     }
     s += '</svg>';
     $('chartBox').innerHTML = s;
@@ -196,7 +186,7 @@
 
     // standards
     const checks = R.evaluate({
-      use: $('use').value, version: $('version').value, sub: $('sub').value, mtype: $('mtype').value,
+      use: $('use').value, material: $('stype').value,
       LL: LL, PL: PL, PI: PI, P75: toNum($('p75').value),
       aggType: $('aggType').value, conType: $('conType').value, abrasion: $('abrasion').value,
 
@@ -235,9 +225,7 @@
     const metadata = [
       ['نام پروژه', $('project').value], ['تاریخ نمونه‌برداری', $('sdate').value],
       ['محل نمونه‌برداری', $('splace').value], ['نوع نمونه', $('stype').value],
-      ['نوع استفاده', $('use').selectedOptions[0]?.textContent],
-      ['مرجع ضوابط', $('version').selectedOptions[0]?.textContent],
-      ['محل مصرف', $('sub').selectedOptions[0]?.textContent]
+      ['نوع استفاده', $('use').selectedOptions[0]?.textContent]
     ].filter(([,v]) => v);
     const metaRows = [];
     for (let i=0;i<metadata.length;i+=2) {
@@ -305,9 +293,16 @@
     } catch (e) { if (!/cancel/i.test(String(e))) toast('خطا در اشتراک‌گذاری: ' + (e.message || e)); }
   }
 
-  function printReport() {
+  async function printReport() {
     makePrintReport();
-    window.print();
+    try {
+      const cap = window.Capacitor;
+      const printer = cap && cap.Plugins && cap.Plugins.WebviewPrint;
+      if (cap && cap.isNativePlatform && cap.isNativePlatform()) {
+        if (!printer || typeof printer.print !== 'function') throw new Error('افزونه چاپ نصب نشده است؛ نسخه جدید برنامه را بسازید.');
+        await printer.print({ name: 'گزارش آزمایش حدود اتربرگ' });
+      } else { window.print(); }
+    } catch (e) { toast('خطا در چاپ: ' + (e.message || e)); }
   }
   $('miPrint').onclick = () => { $('menu').style.display = 'none'; printReport(); };
   $('miShare').onclick = () => { $('menu').style.display = 'none'; shareReport(); };
