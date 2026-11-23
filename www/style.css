@@ -69,11 +69,13 @@ td.res{background:#eef6f4;font-weight:700;color:var(--acc2);min-width:58px}
 .card{padding:12px}
 .card h2{margin-bottom:8px}
 .split{gap:8px}
-table{min-width:340px;table-layout:fixed;width:100%}
+table{min-width:320px;table-layout:fixed;width:100%}
 #llBody td input,#plBody td input{width:100%;padding:4px 0;font-size:10.5px;letter-spacing:-.3px;}
 #llBody td:first-child,#plBody td:first-child{width:7%;}
-#llBody td:last-child,#plBody td:last-child{width:13%;}
-#llBody td:nth-child(2),#llBody td:nth-child(3),#llBody td:nth-child(4),#llBody td:nth-child(5),#plBody td:nth-child(2),#plBody td:nth-child(3),#plBody td:nth-child(4){width:16%;}
+#llBody td:last-child{width:29%;}
+#llBody td:nth-child(2),#llBody td:nth-child(3),#llBody td:nth-child(4),#llBody td:nth-child(5){width:16%;}
+#plBody td:last-child{width:24%;}
+#plBody td:nth-child(2),#plBody td:nth-child(3),#plBody td:nth-child(4){width:23%;}
 th{padding:5px 2px;line-height:1.35;font-size:11px;white-space:normal}
 td input{padding:6px 2px;font-size:12px;min-width:0}
 #plBody tr{height:39px}
