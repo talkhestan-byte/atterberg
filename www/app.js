@@ -12,23 +12,25 @@
   let LL = NaN, PL = NaN;
 
   /* ---------- selects ---------- */
-  function fillSel(el, obj) { el.innerHTML = Object.keys(obj).map(k => `<option value="${k}">${obj[k]}</option>`).join(''); }
+  function fillSel(el, obj, keep) { el.innerHTML = Object.keys(obj).map(k => `<option value="${k}">${obj[k]}</option>`).join(''); if (keep && obj[keep]) el.value = keep; }
   fillSel($('use'), R.USES); fillSel($('version'), R.VERSIONS);
   function refreshSub() {
-    fillSel($('sub'), R.SUBS[$('use').value]);
-    const c = $('use').value === 'concrete';
-    $('extraConcrete').style.display = c ? '' : 'none';
-    updateEarthExtra();
+    const use = $('use').value, ver = $('version').value;
+    if (use === 'concrete' && ver === 'n55') { /* concrete rules come from INSO 302 (+ Pub 101 old) */ }
+    fillSel($('sub'), R.subsFor(use, ver), $('sub').value);
+    updateExtras();
   }
-  function updateEarthExtra() {
-    const lim = (((R.LIMITS[$('use').value] || {})[$('sub').value]) || {})[$('version').value] || {};
-    const show = $('use').value === 'earth' && lim.piMax === undefined && lim.llMax === undefined;
-    $('extraEarth').style.display = show ? 'grid' : 'none';
+  function updateExtras() {
+    const use = $('use').value, ver = $('version').value, sub = $('sub').value;
+    $('typeBox').style.display = R.hasTypes(use, ver, sub) ? '' : 'none';
+    $('concExtra').style.display = use === 'concrete' ? 'grid' : 'none';
+    $('extraEarth').style.display = use === 'earth' ? 'grid' : 'none';
   }
   $('use').onchange = () => { refreshSub(); recalc(); };
-  $('sub').onchange = () => { updateEarthExtra(); recalc(); };
-  $('version').onchange = () => { updateEarthExtra(); recalc(); };
-  ['se', 'projLL', 'projPI'].forEach(i => $(i).addEventListener('input', recalc));
+  $('version').onchange = () => { refreshSub(); recalc(); };
+  $('sub').onchange = () => { updateExtras(); recalc(); };
+  ['se', 'projLL', 'projPI', 'p75'].forEach(i => $(i).addEventListener('input', recalc));
+  ['mtype', 'aggType', 'conType', 'abrasion'].forEach(i => $(i).addEventListener('change', recalc));
   refreshSub();
 
   /* ---------- tables ---------- */
@@ -189,8 +191,9 @@
 
     // standards
     const checks = R.evaluate({
-      use: $('use').value, version: $('version').value, sub: $('sub').value,
-      LL: LL, PL: PL, PI: PI, SE: toNum($('se').value),
+      use: $('use').value, version: $('version').value, sub: $('sub').value, mtype: $('mtype').value,
+      LL: LL, PL: PL, PI: PI, SE: toNum($('se').value), P75: toNum($('p75').value),
+      aggType: $('aggType').value, conType: $('conType').value, abrasion: $('abrasion').value,
       projLL: toNum($('projLL').value), projPI: toNum($('projPI').value)
     });
     const label = { ok: 'مجاز', fail: 'غیرمجاز', warn: 'هشدار', info: 'توضیح', na: 'داده ناقص' };
@@ -199,7 +202,7 @@
       مقدار: ${c.value} &nbsp;|&nbsp; ضابطه: ${c.limit}<br>
       <span class="ref">مرجع: ${c.ref}</span>
       ${c.note ? `<br><span class="ref">${c.note}</span>` : ''}
-      ${c.verify ? `<br><span class="vf">⚠ مقدار/بند را با نسخه چاپی کتاب تطبیق دهید.</span>` : ''}
+      
     </div>`).join('');
   }
   recalc();

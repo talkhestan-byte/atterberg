@@ -25,13 +25,20 @@
       <div><label>محل نمونه‌برداری</label><input id="splace" type="text"></div>
       <div class="full"><label>نوع نمونه</label><input id="stype" type="text" list="stypes"></div>
       <datalist id="stypes"><option value="خاک رس"><option value="خاک لای"><option value="ماسه"><option value="مصالح اساس"><option value="مصالح زیراساس"></datalist>
+      <div class="full"><label>نسخه / مرجع ضوابط</label><select id="version"></select></div>
       <div><label>نوع استفاده</label><select id="use"></select></div>
-      <div><label>نسخه ضوابط</label><select id="version"></select></div>
-      <div class="full"><label>محل مصرف</label><select id="sub"></select></div>
-      <div id="extraConcrete" class="full" style="display:none"><label>ارزش ماسه‌ای (SE) ٪ — لازم برای ضابطه بتن</label><input id="se" type="text" inputmode="decimal"></div>
-      <div id="extraEarth" class="full grid" style="display:none">
-        <div><label>حد مجاز پروژه: LL حداکثر</label><input id="projLL" type="text" inputmode="decimal"></div>
-        <div><label>حد مجاز پروژه: PI حداکثر</label><input id="projPI" type="text" inputmode="decimal"></div>
+      <div><label>محل مصرف</label><select id="sub"></select></div>
+      <div id="typeBox" class="full" style="display:none"><label>نوع مصالح (طبق جدول ضابطه)</label><select id="mtype"><option value="1">نوع ۱</option><option value="2">نوع ۲</option><option value="3">نوع ۳</option></select></div>
+      <div class="full"><label>ارزش ماسه‌ای SE (٪) — اگر ضابطه نیاز دارد</label><input id="se" type="text" inputmode="decimal"></div>
+      <div id="concExtra" class="full grid" style="display:none">
+        <div><label>عبوری از الک ۷۵ میکرون (٪)</label><input id="p75" type="text" inputmode="decimal"></div>
+        <div><label>نوع ماسه</label><select id="aggType"><option value="natural">طبیعی</option><option value="crushed">شکسته</option></select></div>
+        <div><label>نوع بتن</label><select id="conType"><option value="normal">معمولی</option><option value="scc">خودتراکم</option></select></div>
+        <div><label>بتن تحت سایش</label><select id="abrasion"><option value="no">خیر</option><option value="yes">بله</option></select></div>
+      </div>
+      <div id="extraEarth" class="full grid">
+        <div><label>حد مجاز پروژه: LL (اختیاری)</label><input id="projLL" type="text" inputmode="decimal"></div>
+        <div><label>حد مجاز پروژه: PI (اختیاری)</label><input id="projPI" type="text" inputmode="decimal"></div>
       </div>
     </div>
   </section>
