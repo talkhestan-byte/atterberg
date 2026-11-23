@@ -7,8 +7,8 @@
 
   /* ---------- state ---------- */
   const ll = [{}, {}, {}];
-  const pl = [{}, {}];
-  const LL_MIN = 3, LL_MAX = 5, PL_MIN = 2, PL_MAX = 6;
+  const pl = [{}, {}, {}];
+  const LL_MIN = 3, LL_MAX = 5, PL_MIN = 3, PL_MAX = 3;
   let LL = NaN, PL = NaN;
 
   /* ---------- selects ---------- */
@@ -24,12 +24,11 @@
     const use = $('use').value, ver = $('version').value, sub = $('sub').value;
     $('typeBox').style.display = R.hasTypes(use, ver, sub) ? '' : 'none';
     $('concExtra').style.display = use === 'concrete' ? 'grid' : 'none';
-    $('extraEarth').style.display = use === 'earth' ? 'grid' : 'none';
   }
   $('use').onchange = () => { refreshSub(); recalc(); };
   $('version').onchange = () => { refreshSub(); recalc(); };
   $('sub').onchange = () => { updateExtras(); recalc(); };
-  ['se', 'projLL', 'projPI', 'p75'].forEach(i => $(i).addEventListener('input', recalc));
+  ['p75'].forEach(i => $(i).addEventListener('input', recalc));
   ['mtype', 'aggType', 'conType', 'abrasion'].forEach(i => $(i).addEventListener('change', recalc));
   refreshSub();
 
@@ -63,19 +62,17 @@
       const t = document.createElement('td'); t.className = 'res'; t.id = plw(i); tr.appendChild(t);
       b.appendChild(tr);
     });
-    $('plAdd').disabled = pl.length >= PL_MAX; $('plDel').disabled = pl.length <= PL_MIN;
   }
   const plw = i => 'plw' + i;
   $('llAdd').onclick = () => { if (ll.length < LL_MAX) { ll.push({}); renderLL(); recalc(); } };
   $('llDel').onclick = () => { if (ll.length > LL_MIN) { ll.pop(); renderLL(); recalc(); } };
-  $('plAdd').onclick = () => { if (pl.length < PL_MAX) { pl.push({}); renderPL(); recalc(); } };
-  $('plDel').onclick = () => { if (pl.length > PL_MIN) { pl.pop(); renderPL(); recalc(); } };
   renderLL(); renderPL();
 
   /* ---------- chart ---------- */
   const W = 700, H = 470, ML = 58, MR = 18, MT = 18, MB = 50;
-  const XMIN = 10, XMAX = 100;
-  const px = N => ML + (Math.log10(N) - 1) / 1 * (W - ML - MR);
+  const XMIN = 9, XMAX = 60;
+  const LOG_RANGE = Math.log10(XMAX / XMIN);
+  const px = N => ML + (Math.log10(N / XMIN) / LOG_RANGE) * (W - ML - MR);
   function drawChart(pts, fit, llVal) {
     // y range
     let ys = pts.map(p => p.w);
@@ -84,13 +81,15 @@
     if (ys.length) { lo = Math.floor((Math.min(...ys) - 4) / 5) * 5; hi = Math.ceil((Math.max(...ys) + 4) / 5) * 5; }
     if (hi - lo < 15) hi = lo + 15;
     const py = w => MT + (hi - w) / (hi - lo) * (H - MT - MB);
+    const plotBottom = H - MB, plotRight = W - MR;
     let s = `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" font-family="Tahoma,sans-serif">`;
     s += `<rect width="${W}" height="${H}" fill="#fff"/>`;
     // vertical grid (log)
+    const majorX = [9, 10, 15, 20, 25, 30, 40, 50, 60];
     const minors = [];
-    for (let n = XMIN; n <= XMAX; n += (n < 30 ? 1 : n < 50 ? 2 : 5)) minors.push(n);
-    minors.forEach(n => { s += `<line x1="${px(n)}" y1="${MT}" x2="${px(n)}" y2="${H - MB}" stroke="#e8c9c9" stroke-width="0.5"/>`; });
-    [10, 20, 30, 40, 50, 60, 70, 80, 90, 100].forEach(n => { s += `<line x1="${px(n)}" y1="${MT}" x2="${px(n)}" y2="${H - MB}" stroke="#d9a4a4" stroke-width="1"/>`; });
+    for (let n = 10; n < 60; n += (n < 20 ? 1 : n < 30 ? 2 : 5)) if (!majorX.includes(n)) minors.push(n);
+    minors.forEach(n => { s += `<line x1="${px(n)}" y1="${MT}" x2="${px(n)}" y2="${plotBottom}" stroke="#e8c9c9" stroke-width="0.5"/>`; });
+    majorX.forEach(n => { s += `<line x1="${px(n)}" y1="${MT}" x2="${px(n)}" y2="${plotBottom}" stroke="#d9a4a4" stroke-width="1"/>`; });
     s += `<line x1="${px(25)}" y1="${MT}" x2="${px(25)}" y2="${H - MB}" stroke="#c97b7b" stroke-width="1.3"/>`;
     // horizontal grid
     for (let w = lo; w <= hi + 1e-9; w += 1) {
@@ -99,27 +98,30 @@
     }
     // frame + axes labels
     s += `<rect x="${ML}" y="${MT}" width="${W - ML - MR}" height="${H - MT - MB}" fill="none" stroke="#333" stroke-width="1.4"/>`;
-    [10, 15, 20, 25, 30, 40, 50, 60, 70, 80, 100].forEach(n => {
+    [9, 10, 15, 20, 25, 30, 40, 50, 60].forEach(n => {
       s += `<text x="${px(n)}" y="${H - MB + 16}" font-size="11" text-anchor="middle" fill="#333">${n}</text>`;
     });
-    for (let w = lo; w <= hi; w += 5) s += `<text x="${ML - 6}" y="${py(w) + 4}" font-size="11" text-anchor="end" fill="#333">${w}</text>`;
+    for (let w = lo; w <= hi; w += 5) s += `<text x="${ML - 12}" y="${py(w) + 4}" font-size="11" text-anchor="end" fill="#333">${w}</text>`;
     s += `<text x="${(ML + W - MR) / 2}" y="${H - 8}" font-size="12" text-anchor="middle" fill="#333">تعداد ضربه (N) — مقیاس لگاریتمی</text>`;
     s += `<text transform="translate(14 ${(MT + H - MB) / 2}) rotate(-90)" font-size="12" text-anchor="middle" fill="#333">درصد رطوبت (٪)</text>`;
     // flow line (clipped to plot area)
     if (fit) {
-      let x1 = XMIN, x2 = XMAX, y1 = wAt(fit, x1), y2 = wAt(fit, x2);
-      // clip in y
-      const clip = (xa, ya, xb, yb) => {
-        const a = Math.log10(xa), b = Math.log10(xb);
-        const ts = [];
-        [lo, hi].forEach(yy => { const t = (yy - ya) / (yb - ya); if (t > 0 && t < 1) ts.push(t); });
-        let t0 = 0, t1 = 1;
-        if (ya < lo || ya > hi) { const c = ts.filter(t => t > 0); if (c.length) t0 = Math.min(...c); }
-        if (yb < lo || yb > hi) { const c = ts.filter(t => t < 1); if (c.length) t1 = Math.max(...c); }
-        return [Math.pow(10, a + (b - a) * t0), ya + (yb - ya) * t0, Math.pow(10, a + (b - a) * t1), ya + (yb - ya) * t1];
-      };
-      [x1, y1, x2, y2] = clip(x1, y1, x2, y2);
-      s += `<line x1="${px(x1)}" y1="${py(y1)}" x2="${px(x2)}" y2="${py(y2)}" stroke="#1b4f9c" stroke-width="2"/>`;
+      const xStart = XMIN + 0.18, xEnd = XMAX - 0.35;
+      const yStart = wAt(fit, xStart), yEnd = wAt(fit, xEnd);
+      const innerLo = lo + 0.35, innerHi = hi - 0.35;
+      let t0 = 0, t1 = 1;
+      const dy = yEnd - yStart;
+      if (Math.abs(dy) > 1e-9) {
+        const ta = (innerLo - yStart) / dy, tb = (innerHi - yStart) / dy;
+        const enter = Math.min(ta, tb), leave = Math.max(ta, tb);
+        t0 = Math.max(0, enter); t1 = Math.min(1, leave);
+      } else if (yStart < innerLo || yStart > innerHi) { t0 = 1; t1 = 0; }
+      if (t1 > t0) {
+        const a = Math.log10(xStart), b = Math.log10(xEnd);
+        const x1 = Math.pow(10, a + (b - a) * t0), x2 = Math.pow(10, a + (b - a) * t1);
+        const y1 = yStart + dy * t0, y2 = yStart + dy * t1;
+        s += `<line x1="${px(x1)}" y1="${py(y1)}" x2="${px(x2)}" y2="${py(y2)}" stroke="#1b4f9c" stroke-width="2.2" stroke-linecap="round"/>`;
+      }
     }
     // points
     pts.forEach(p => { s += `<circle cx="${px(p.n)}" cy="${py(p.w)}" r="4.5" fill="#fff" stroke="#1b4f9c" stroke-width="2"/><circle cx="${px(p.n)}" cy="${py(p.w)}" r="1.6" fill="#1b4f9c"/>`; });
@@ -129,8 +131,10 @@
       s += `<line x1="${X}" y1="${Y}" x2="${X}" y2="${H - MB}" stroke="#e00000" stroke-width="0.9" stroke-dasharray="5 4"/>`;
       s += `<line x1="${X}" y1="${Y}" x2="${ML}" y2="${Y}" stroke="#e00000" stroke-width="0.9" stroke-dasharray="5 4"/>`;
       s += `<circle cx="${X}" cy="${Y}" r="3" fill="#e00000"/>`;
-      s += `<text x="${ML + 4}" y="${Y - 4}" font-size="11" fill="#e00000" font-weight="bold">${f1(llVal)}</text>`;
-      s += `<text x="${X + 3}" y="${H - MB - 4}" font-size="11" fill="#e00000" font-weight="bold">25</text>`;
+      s += `<rect x="${ML - 53}" y="${Y - 18}" width="38" height="15" rx="3" fill="#fff"/>`;
+      s += `<text x="${ML - 17}" y="${Y - 7}" font-size="11" text-anchor="end" fill="#e00000" font-weight="bold">${f1(llVal)}</text>`;
+      s += `<rect x="${X + 5}" y="${H - MB + 19}" width="22" height="14" rx="3" fill="#fff"/>`;
+      s += `<text x="${X + 16}" y="${H - MB + 30}" font-size="11" text-anchor="middle" fill="#e00000" font-weight="bold">25</text>;
     }
     s += '</svg>';
     $('chartBox').innerHTML = s;
@@ -154,7 +158,7 @@
     if (pts.length > 0 && pts.length < LL_MIN) msg.push(`حداقل ${LL_MIN} نقطه لازم است (${pts.length} نقطه معتبر).`);
     if (fit) {
       const ns = pts.map(p => p.n);
-      if (Math.min(...ns) > 35 || Math.max(...ns) < 15) msg.push('تعداد ضربه‌ها خارج از بازه ۱۵ تا ۳۵ است.');
+      if (Math.min(...ns) < 9 || Math.max(...ns) > 60) msg.push('برای نمودار، تعداد ضربه‌ها باید در محدوده ۹ تا ۶۰ باشد.');
       else if (!(Math.min(...ns) <= 25 && Math.max(...ns) >= 25)) msg.push('بهتر است نقاط در دو طرف ۲۵ ضربه قرار گیرند.');
       if (fit.m >= 0) msg.push('شیب خط باید منفی باشد؛ داده‌ها را بررسی کنید.');
       if (fit.r2 < 0.95) msg.push('همبستگی خط پایین است (R² = ' + f2(fit.r2) + ').');
@@ -192,9 +196,9 @@
     // standards
     const checks = R.evaluate({
       use: $('use').value, version: $('version').value, sub: $('sub').value, mtype: $('mtype').value,
-      LL: LL, PL: PL, PI: PI, SE: toNum($('se').value), P75: toNum($('p75').value),
+      LL: LL, PL: PL, PI: PI, SE: NaN, P75: toNum($('p75').value),
       aggType: $('aggType').value, conType: $('conType').value, abrasion: $('abrasion').value,
-      projLL: toNum($('projLL').value), projPI: toNum($('projPI').value)
+      projLL: NaN, projPI: NaN
     });
     const label = { ok: 'مجاز', fail: 'غیرمجاز', warn: 'هشدار', info: 'توضیح', na: 'داده ناقص' };
     $('checks').innerHTML = checks.map(c => `<div class="chk ${c.status}">
@@ -215,55 +219,95 @@
   function askName() {
     return new Promise(res => {
       const m = $('modal'), inp = $('fname');
-      inp.value = (($('project').value || 'Atterberg').trim() + '_' + new Date().toISOString().slice(0, 10)).replace(/\s+/g, '_');
+      inp.value = (($('project').value || 'Atterberg').trim() + '_' + new Date().toISOString().slice(0, 10)).replace(/\\s+/g, '_');
       m.style.display = 'flex'; setTimeout(() => { inp.focus(); inp.select(); }, 50);
       const done = v => { m.style.display = 'none'; $('mOk').onclick = $('mCancel').onclick = null; res(v); };
       $('mOk').onclick = () => done(inp.value.trim() || 'Atterberg');
       $('mCancel').onclick = () => done(null);
     });
   }
-  const safe = n => n.replace(/[\\/:*?"<>|]/g, '_').replace(/\.pdf$/i, '');
+  const safe = n => n.replace(/[\\\\/:*?"<>|]/g, '_').replace(/\\.pdf$/i, '');
+
+  const esc = value => String(value == null ? '' : value).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+  function makePrintReport() {
+    const date = new Date().toLocaleDateString('fa-IR');
+    const metadata = [
+      ['نام پروژه', $('project').value], ['تاریخ نمونه‌برداری', $('sdate').value],
+      ['محل نمونه‌برداری', $('splace').value], ['نوع نمونه', $('stype').value],
+      ['نوع استفاده', $('use').selectedOptions[0]?.textContent],
+      ['مرجع ضوابط', $('version').selectedOptions[0]?.textContent],
+      ['محل مصرف', $('sub').selectedOptions[0]?.textContent]
+    ].filter(([,v]) => v);
+    const metaRows = [];
+    for (let i=0;i<metadata.length;i+=2) {
+      const a=metadata[i], b=metadata[i+1];
+      metaRows.push('<tr><td>'+esc(a[0])+'</td><td>'+esc(a[1])+'</td><td>'+(b?esc(b[0]):'')+'</td><td>'+(b?esc(b[1]):'')+'</td></tr>');
+    }
+    const llRows = ll.map((r,i)=>'<tr><td>'+(i+1)+'</td><td>'+esc(r.n)+'</td><td>'+esc(r.can)+'</td><td>'+esc(r.wet)+'</td><td>'+esc(r.dry)+'</td><td>'+esc($('llw'+i).textContent)+'</td></tr>').join('');
+    const plRows = pl.map((r,i)=>'<tr><td>'+(i+1)+'</td><td>'+esc(r.can)+'</td><td>'+esc(r.wet)+'</td><td>'+esc(r.dry)+'</td><td>'+esc($('plw'+i).textContent)+'</td></tr>').join('');
+    const pi = $('rPI').value || '—';
+    const interpretation = !isFinite(LL) || !isFinite(PL)
+      ? 'برای ارائه تفسیر نهایی، ورود داده‌های معتبر هر دو آزمون حد روانی و حد خمیری لازم است.'
+      : (pi === 'NP'
+        ? 'شاخص خمیری صفر یا منفی است؛ نمونه در این آزمون به‌صورت غیرخمیری (NP) گزارش می‌شود.'
+        : 'شاخص خمیری برابر اختلاف حد روانی و حد خمیری است. این مقدار بیانگر دامنه رطوبتی رفتار خمیری خاک است؛ تعیین گروه‌بندی نهایی خاک مستلزم اطلاعات دانه‌بندی و در صورت نیاز نمودار خمیری است.');
+    $('printReport').innerHTML = `<article class="print-sheet">
+      <h1>گزارش آزمایش حدود اتربرگ</h1><div style="text-align:center;color:#555">حد روانی (کاساگرانده)، حد خمیری و شاخص خمیری</div>
+      <div style="text-align:left;font-size:10px;color:#666">تاریخ تهیه گزارش: ${esc(date)}</div>
+      <h2>۱. مشخصات نمونه و پروژه</h2>
+      <table class="meta"><tbody>${metaRows.join('')}</tbody></table>
+      <h2>۲. نتایج آزمون</h2>
+      <table><thead><tr><th colspan="6">حد روانی (LL)</th></tr><tr><th>ردیف</th><th>تعداد ضربه</th><th>وزن قوطی (g)</th><th>قوطی + تر (g)</th><th>قوطی + خشک (g)</th><th>رطوبت (%)</th></tr></thead><tbody>${llRows}</tbody></table>
+      <table><thead><tr><th colspan="5">حد خمیری (PL)</th></tr><tr><th>ردیف</th><th>وزن قوطی (g)</th><th>قوطی + تر (g)</th><th>قوطی + خشک (g)</th><th>رطوبت (%)</th></tr></thead><tbody>${plRows}</tbody></table>
+      <h2>۳. نمودار جریان</h2><div id="printGraph">${$('chartBox').innerHTML}</div>
+      <h2>۴. نتایج نهایی</h2>
+      <div class="final-values"><div>حد روانی (LL)<strong>${esc($('rLL').value || '—')}٪</strong></div><div>حد خمیری (PL)<strong>${esc($('rPL').value || '—')}٪</strong></div><div>شاخص خمیری (PI)<strong>${esc(pi)}${pi==='NP'?'':'٪'}</strong></div></div>
+      <h2>۵. تفسیر نتیجه</h2><div class="interpretation">${esc(interpretation)}<hr><b>کنترل ضوابط و توضیحات مرتبط:</b>${$('checks').innerHTML || '<p>موردی برای نمایش ثبت نشده است.</p>'}</div>
+    </article>`;
+  }
 
   async function buildPdf() {
-    const el = $('report');
-    const canvas = await html2canvas(el, { scale: 2, backgroundColor: '#f3efe6', useCORS: true, ignoreElements: e => e.hasAttribute && e.hasAttribute('data-pdf-ignore') });
-    const { jsPDF } = window.jspdf;
-    const pdf = new jsPDF({ unit: 'mm', format: 'a4' });
-    const pw = 210, ph = 297, m = 8, iw = pw - 2 * m, ih = ph - 2 * m;
-    const pagePx = Math.floor(canvas.width * ih / iw);
-    let y = 0, first = true;
-    while (y < canvas.height) {
-      const h = Math.min(pagePx, canvas.height - y);
-      const part = document.createElement('canvas');
-      part.width = canvas.width; part.height = h;
-      part.getContext('2d').drawImage(canvas, 0, y, canvas.width, h, 0, 0, canvas.width, h);
-      if (!first) pdf.addPage();
-      pdf.addImage(part.toDataURL('image/jpeg', 0.92), 'JPEG', m, m, iw, h * iw / canvas.width);
-      first = false; y += h;
-    }
-    return pdf;
-  }
-  async function exportPdf(mode) {
-    const name = await askName(); if (name === null) return;
-    const fn = safe(name) + '.pdf';
+    makePrintReport();
+    const el = $('printReport'); el.classList.add('rendering');
+    await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
     try {
-      toast('در حال ساخت PDF…');
-      const pdf = await buildPdf();
-      const cap = window.Capacitor, P = cap && cap.Plugins;
-      if (!(cap && cap.isNativePlatform && cap.isNativePlatform() && P && P.Filesystem)) { pdf.save(fn); return; }
-      const data = pdf.output('datauristring').split(',')[1];
-      if (mode === 'print') {
-        try {
-          const r = await P.Filesystem.writeFile({ path: fn, data, directory: 'DOCUMENTS', recursive: true });
-          toast('ذخیره شد: Documents/' + fn);
-          if (P.Share) await P.Share.share({ title: fn, url: r.uri });
-          return;
-        } catch (e) { /* fall back to share sheet below */ }
+      const canvas = await html2canvas(el, { scale: 2, backgroundColor: '#ffffff', useCORS: true });
+      const { jsPDF } = window.jspdf;
+      const pdf = new jsPDF({ unit: 'mm', format: 'a4' });
+      const pw = 210, m = 8, iw = pw - 2 * m, ih = 297 - 2 * m;
+      const pagePx = Math.floor(canvas.width * ih / iw);
+      let y = 0, first = true;
+      while (y < canvas.height) {
+        const h = Math.min(pagePx, canvas.height - y);
+        const part = document.createElement('canvas'); part.width = canvas.width; part.height = h;
+        part.getContext('2d').drawImage(canvas, 0, y, canvas.width, h, 0, 0, canvas.width, h);
+        if (!first) pdf.addPage();
+        pdf.addImage(part.toDataURL('image/jpeg', 0.94), 'JPEG', m, m, iw, h * iw / canvas.width);
+        first = false; y += h;
       }
-      const r = await P.Filesystem.writeFile({ path: fn, data, directory: 'CACHE' });
-      await P.Share.share({ title: fn, url: r.uri, dialogTitle: 'اشتراک‌گذاری گزارش' });
-    } catch (e) { if (!/cancel/i.test(String(e))) toast('خطا در ساخت PDF: ' + (e.message || e)); }
+      return pdf;
+    } finally { el.classList.remove('rendering'); }
   }
-  $('miPrint').onclick = () => exportPdf('print');
-  $('miShare').onclick = () => exportPdf('share');
+
+  async function shareReport() {
+    const name = await askName(); if (name === null) return;
+    try {
+      toast('در حال آماده‌سازی گزارش برای اشتراک‌گذاری…');
+      const pdf = await buildPdf(), fn = safe(name) + '.pdf';
+      const cap = window.Capacitor, P = cap && cap.Plugins;
+      if (!(cap && cap.isNativePlatform && cap.isNativePlatform() && P && P.Filesystem && P.Share)) {
+        pdf.save(fn); toast('فایل گزارش ذخیره شد.'); return;
+      }
+      const data = pdf.output('datauristring').split(',')[1];
+      const r = await P.Filesystem.writeFile({ path: fn, data, directory: 'CACHE' });
+      await P.Share.share({ title: fn, url: r.uri, dialogTitle: 'اشتراک‌گذاری گزارش آزمایش' });
+    } catch (e) { if (!/cancel/i.test(String(e))) toast('خطا در اشتراک‌گذاری: ' + (e.message || e)); }
+  }
+
+  function printReport() {
+    makePrintReport();
+    window.print();
+  }
+  $('miPrint').onclick = () => { $('menu').style.display = 'none'; printReport(); };
+  $('miShare').onclick = () => { $('menu').style.display = 'none'; shareReport(); };
 })();
