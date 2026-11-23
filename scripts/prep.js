@@ -4,7 +4,8 @@ const out = path.join(__dirname, '..', 'www', 'lib');
 fs.mkdirSync(out, { recursive: true });
 const files = [
   ['jspdf/dist/jspdf.umd.min.js', 'jspdf.umd.min.js'],
-  ['html2canvas/dist/html2canvas.min.js', 'html2canvas.min.js']
+  ['html2canvas/dist/html2canvas.min.js', 'html2canvas.min.js'],
+  ['capacitor-webview-print/dist/plugin.js', 'webview-print.js']
 ];
 for (const [src, dst] of files) {
   const from = path.join(__dirname, '..', 'node_modules', src);
