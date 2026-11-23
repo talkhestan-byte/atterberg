@@ -80,10 +80,6 @@
       }
       out.push(chk(rule.piNote ? 'دامنه خمیری (PI) خاک مارنی/رسی' : 'شاخص خمیری (PI)' + typeTxt, f1(c.PI), 'حداکثر ' + r.piMax, st, ref, note));
     }
-    if (isFinite(r.seMin)) {
-      const ok = isFinite(c.SE) ? c.SE >= r.seMin : null;
-      out.push(chk('ارزش ماسه‌ای (SE)' + typeTxt, f1(c.SE), 'حداقل ' + r.seMin + '٪', ok === null ? 'na' : ok ? 'ok' : 'fail', ref, rule.seNote || (ok === null ? 'برای این ضابطه مقدار SE را در مشخصات عمومی وارد کنید.' : '')));
-    }
     if (rule.expansive && isFinite(c.LL) && isFinite(c.PI)) {
       const hi = c.PI > 35 && c.LL > 60;
       out.push(chk('احتمال خاک منبسط‌شونده', 'LL=' + f1(c.LL) + ' ، PI=' + f1(c.PI), 'تورم زیاد: PI>35 و LL>60 و مکش خاک>4',
@@ -118,13 +114,6 @@
       out.push(chk('مواد ریزتر از الک ۷۵ میکرون (ASTM C117)', f1(c.P75) + '٪', 'حداکثر ' + lim + '٪', ok ? 'ok' : 'fail', R302 + ' ـ جدول ۱، ص ۷', why));
     } else {
       out.push(chk('مواد ریزتر از الک ۷۵ میکرون (ASTM C117)', '—', 'حداکثر ' + lim + '٪', 'na', R302 + ' ـ جدول ۱، ص ۷', 'درصد عبوری از الک ۷۵ میکرون را در مشخصات عمومی وارد کنید. ' + why));
-    }
-    // 3) sand equivalent (old Pub 101 only)
-    if (c.version === 'old') {
-      const ok = isFinite(c.SE) ? c.SE >= 75 : null;
-      out.push(chk('ارزش ماسه‌ای (SE)', f1(c.SE), 'حداقل ۷۵٪', ok === null ? 'na' : ok ? 'ok' : 'fail', SRC.old + ' ـ فصل ۴، بند ۳-۲ (سنگدانه‌های ریز)، ص ۵۸', ok === null ? 'مقدار SE را در مشخصات عمومی وارد کنید.' : ''));
-    } else {
-      out.push(chk('ارزش ماسه‌ای (SE)', '—', '—', 'info', SRC[c.version], 'در این مرجع، فصل بتن به آیین‌نامه بتن ایران (آبا) ارجاع داده و حد عددی SE برای ماسه بتن ندارد.'));
     }
     return out;
   }
