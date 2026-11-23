@@ -57,3 +57,49 @@ td.res{background:#eef6f4;font-weight:700;color:var(--acc2);min-width:58px}
 #modal .ok{background:var(--acc2);color:#fff}
 #modal .cancel{background:#eee}
 #toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#333;color:#fff;padding:10px 16px;border-radius:20px;font-size:13px;display:none;z-index:60;max-width:90%}
+
+/* Compact paired label/input layout */
+.grid{gap:7px 9px}
+.grid>div:not(.grid){display:grid;grid-template-columns:minmax(92px,38%) minmax(0,1fr);align-items:center;gap:6px;min-width:0}
+.grid>div:not(.grid)>label{margin:0;line-height:1.45}
+.grid>div:not(.grid)>input,.grid>div:not(.grid)>select{min-width:0;padding:7px 8px}
+.grid>div.full{grid-column:1/-1}
+.grid>div.full:not(.grid){grid-template-columns:minmax(110px,24%) minmax(0,1fr)}
+#concExtra.grid>div{grid-template-columns:minmax(92px,42%) minmax(0,1fr)}
+.card{padding:12px}
+.card h2{margin-bottom:8px}
+.split{gap:8px}
+table{min-width:390px;table-layout:fixed}
+th{padding:5px 2px;line-height:1.35;font-size:11px;white-space:normal}
+td input{padding:6px 2px;font-size:12px;min-width:0}
+#plBody tr{height:39px}
+#printReport{display:none}
+#printReport.rendering{display:block;position:fixed;left:-10000px;top:0;width:794px;background:#fff;color:#111;z-index:-1}
+.print-sheet{direction:rtl;font-family:Tahoma,sans-serif;padding:28px;background:#fff;color:#111;font-size:13px;line-height:1.7}
+.print-sheet h1{font-size:21px;text-align:center;margin:0 0 5px}
+.print-sheet h2{font-size:16px;border-bottom:2px solid #555;padding-bottom:5px;margin:18px 0 8px}
+.print-sheet table{width:100%;min-width:0;border-collapse:collapse;table-layout:auto;margin:8px 0}
+.print-sheet th,.print-sheet td{border:1px solid #777;padding:6px;text-align:center;font-size:12px;color:#111;background:#fff}
+.print-sheet .meta td:first-child{font-weight:bold;background:#f1f1f1;width:18%}
+.print-sheet .final-values{display:flex;gap:12px;margin:12px 0}
+.print-sheet .final-values>div{flex:1;border:1px solid #777;padding:10px;text-align:center}
+.print-sheet .final-values strong{display:block;font-size:18px;margin-top:5px}
+.print-sheet #printGraph svg{width:100%;height:auto}
+.print-sheet .interpretation{border:1px solid #888;padding:10px;margin-top:8px}
+@media print{
+  @page{size:A4;margin:12mm}
+  body{background:#fff!important}
+  body>*{display:none!important}
+  #printReport,#printReport.rendering{display:block!important;position:static!important;left:auto!important;top:auto!important;width:auto!important;z-index:auto!important}
+  .print-sheet{padding:0}
+  .print-sheet h2{break-after:avoid}
+  .print-sheet table,.print-sheet .final-values,.print-sheet .interpretation{break-inside:avoid}
+}
+@media(max-width:520px){
+  main{padding:8px}
+  .card{padding:10px}
+  .grid{gap:6px}
+  .grid>div:not(.grid){grid-template-columns:minmax(78px,38%) minmax(0,1fr);gap:4px}
+  .grid>div.full:not(.grid){grid-template-columns:minmax(92px,28%) minmax(0,1fr)}
+  input,select{font-size:13px}
+}
