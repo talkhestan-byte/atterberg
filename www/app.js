@@ -197,9 +197,9 @@
     // standards
     const checks = R.evaluate({
       use: $('use').value, version: $('version').value, sub: $('sub').value, mtype: $('mtype').value,
-      LL: LL, PL: PL, PI: PI, SE: NaN, P75: toNum($('p75').value),
+      LL: LL, PL: PL, PI: PI, P75: toNum($('p75').value),
       aggType: $('aggType').value, conType: $('conType').value, abrasion: $('abrasion').value,
-      projLL: NaN, projPI: NaN
+
     });
     const label = { ok: 'مجاز', fail: 'غیرمجاز', warn: 'هشدار', info: 'توضیح', na: 'داده ناقص' };
     $('checks').innerHTML = checks.map(c => `<div class="chk ${c.status}">
