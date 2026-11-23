@@ -1,1 +1,94 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>آزمایش حدود اتربرگ</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header data-pdf-ignore>
+  <div><h1>آزمایش حدود اتربرگ</h1><small>حد روانی (کاساگرانده) · حد خمیری · شاخص خمیری</small></div>
+  <button id="menuBtn" aria-label="منو">⋮</button>
+  <div id="menu">
+    <button id="miPrint">🖨 چاپ (ذخیره PDF)</button>
+    <button id="miShare">📤 اشتراک‌گذاری</button>
+  </div>
+</header>
 
+<main id="report">
+  <section class="card">
+    <h2>مشخصات عمومی</h2>
+    <div class="grid">
+      <div class="full"><label>نام پروژه</label><input id="project" type="text"></div>
+      <div><label>تاریخ نمونه‌برداری</label><input id="sdate" type="date"></div>
+      <div><label>محل نمونه‌برداری</label><input id="splace" type="text"></div>
+      <div class="full"><label>نوع نمونه</label><input id="stype" type="text" list="stypes"></div>
+      <datalist id="stypes"><option value="خاک رس"><option value="خاک لای"><option value="ماسه"><option value="مصالح اساس"><option value="مصالح زیراساس"></datalist>
+      <div><label>نوع استفاده</label><select id="use"></select></div>
+      <div><label>نسخه ضوابط</label><select id="version"></select></div>
+      <div class="full"><label>محل مصرف</label><select id="sub"></select></div>
+      <div id="extraConcrete" class="full" style="display:none"><label>ارزش ماسه‌ای (SE) ٪ — لازم برای ضابطه بتن</label><input id="se" type="text" inputmode="decimal"></div>
+      <div id="extraEarth" class="full grid" style="display:none">
+        <div><label>حد مجاز پروژه: LL حداکثر</label><input id="projLL" type="text" inputmode="decimal"></div>
+        <div><label>حد مجاز پروژه: PI حداکثر</label><input id="projPI" type="text" inputmode="decimal"></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>حد روانی (LL)</h2>
+    <div class="split">
+      <div class="gif-slot"><img src="assets/ll.gif" alt="" onerror="this.parentNode.classList.add('empty')"><span>محل گیف حد روانی</span></div>
+      <div style="flex:1;font-size:12px;color:var(--mut);line-height:1.9">۳ تا ۵ نمونه با تعداد ضربه‌های متفاوت (ترجیحاً بین ۱۵ تا ۳۵ ضربه). قوطی + نمونه تر و قوطی + نمونه خشک را بر حسب گرم وارد کنید.</div>
+    </div>
+    <div class="tbl-wrap" style="margin-top:10px"><table>
+      <thead><tr><th>#</th><th>تعداد ضربه N</th><th>وزن قوطی (g)</th><th>قوطی+نمونه تر (g)</th><th>قوطی+نمونه خشک (g)</th><th>رطوبت ٪</th></tr></thead>
+      <tbody id="llBody"></tbody>
+    </table></div>
+    <div class="rowbtns"><button id="llDel">− حذف ردیف</button><button id="llAdd" class="add">+ افزودن ردیف</button></div>
+    <div class="msg" id="llMsg"></div>
+    <div id="chartBox"></div>
+    <div class="out"><div><label>LL (در ۲۵ ضربه)</label><input id="llOut" readonly placeholder="?= LL"></div></div>
+  </section>
+
+  <section class="card">
+    <h2>حد خمیری (PL)</h2>
+    <div class="split">
+      <div class="gif-slot"><img src="assets/pl.gif" alt="" onerror="this.parentNode.classList.add('empty')"><span>محل گیف حد خمیری</span></div>
+      <div style="flex:1;font-size:12px;color:var(--mut);line-height:1.9">حداقل ۲ نمونه؛ میانگین رطوبت‌ها به‌عنوان PL گزارش می‌شود.</div>
+    </div>
+    <div class="tbl-wrap" style="margin-top:10px"><table>
+      <thead><tr><th>#</th><th>وزن قوطی (g)</th><th>قوطی+نمونه تر (g)</th><th>قوطی+نمونه خشک (g)</th><th>رطوبت ٪</th></tr></thead>
+      <tbody id="plBody"></tbody>
+    </table></div>
+    <div class="rowbtns"><button id="plDel">− حذف ردیف</button><button id="plAdd" class="add">+ افزودن ردیف</button></div>
+    <div class="msg" id="plMsg"></div>
+    <div class="out"><div><label>PL</label><input id="plOut" readonly placeholder="?= PL"></div></div>
+  </section>
+
+  <section class="card">
+    <h2>نتیجه</h2>
+    <div class="out three">
+      <div><label>LL</label><input id="rLL" readonly></div>
+      <div><label>PL</label><input id="rPL" readonly></div>
+      <div><label>PI = LL − PL</label><input id="rPI" class="pi" readonly></div>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>کنترل با ضوابط</h2>
+    <div id="checks"></div>
+  </section>
+</main>
+
+<div id="modal"><div class="box"><h3>نام فایل PDF</h3><input id="fname" type="text"><div class="btns"><button class="cancel" id="mCancel">انصراف</button><button class="ok" id="mOk">تأیید</button></div></div></div>
+<div id="toast"></div>
+
+<script src="lib/html2canvas.min.js"></script>
+<script src="lib/jspdf.umd.min.js"></script>
+<script src="calc.js"></script>
+<script src="rules.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
