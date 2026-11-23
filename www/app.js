@@ -134,7 +134,7 @@
       s += `<rect x="${ML - 53}" y="${Y - 18}" width="38" height="15" rx="3" fill="#fff"/>`;
       s += `<text x="${ML - 17}" y="${Y - 7}" font-size="11" text-anchor="end" fill="#e00000" font-weight="bold">${f1(llVal)}</text>`;
       s += `<rect x="${X + 5}" y="${H - MB + 19}" width="22" height="14" rx="3" fill="#fff"/>`;
-      s += `<text x="${X + 16}" y="${H - MB + 30}" font-size="11" text-anchor="middle" fill="#e00000" font-weight="bold">25</text>;
+      s += `<text x="${X + 16}" y="${H - MB + 30}" font-size="11" text-anchor="middle" fill="#e00000" font-weight="bold">25</text>`;
     }
     s += '</svg>';
     $('chartBox').innerHTML = s;
