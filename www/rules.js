@@ -115,7 +115,23 @@
     return out;
   }
 
-  function evaluate(c) { return c.use === 'concrete' ? evalConcrete(c) : evalEarth(c); }
+  function evaluate(c) {
+    if (c.use === 'concrete') return evalConcrete(c);
+    const out = [];
+    ['old', 'new', 'n55'].forEach(version => {
+      const groups = E[version] || {};
+      Object.keys(groups).forEach(sub => {
+        const rule = groups[sub];
+        if (rule.types) {
+          Object.keys(rule.types).forEach(mtype => {
+            const rows = evalEarth(Object.assign({}, c, { version, sub, mtype }));
+            rows.forEach(row => { row.title += ' — نوع ' + mtype; out.push(row); });
+          });
+        } else out.push(...evalEarth(Object.assign({}, c, { version, sub })));
+      });
+    });
+    return out.map(row => { if (c.material) row.title = c.material + ' | ' + row.title; return row; });
+  }
   const api = { SRC, USES, VERSIONS, subsFor, hasTypes, evaluate };
   if (typeof module !== 'undefined' && module.exports) module.exports = api; else root.Rules = api;
 })(typeof window !== 'undefined' ? window : globalThis);
